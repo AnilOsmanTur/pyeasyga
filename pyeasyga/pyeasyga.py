@@ -9,6 +9,8 @@ import copy
 import numpy as np
 from operator import attrgetter
 
+from multiprocessing.dummy import Pool as ThreadPool
+
 from six.moves import range
 
 
@@ -42,7 +44,8 @@ class GeneticAlgorithm(object):
                  mutation_probability=0.2,
                  elitism=True,
                  maximise_fitness=True,
-                 random_seed=None):
+                 random_seed=None,
+                 num_workers=4):
         """Instantiate the Genetic Algorithm.
 
         :param seed_data: input data to the Genetic Algorithm
@@ -53,6 +56,7 @@ class GeneticAlgorithm(object):
         :param float mutation_probability: probability of mutation operation
 
         """
+
         random.seed(random_seed)
         self.seed_data = seed_data
         self.population_size = population_size
@@ -64,7 +68,7 @@ class GeneticAlgorithm(object):
 
         self.current_generation = []
         self.fitness_stats = np.zeros(population_size)
-    
+        self.num_workers = num_workers
 
         def create_individual(seed_data):
             """Create a candidate solution representation.
@@ -122,18 +126,31 @@ class GeneticAlgorithm(object):
         self.mutate_function = mutate
         self.selection_function = self.tournament_selection
 
+
+    def concurrent_creation(self, idx):
+        genes = np.array(self.create_individual(self.seed_data)).astype(np.int8)
+        individual = Chromosome(genes)
+        print(f'\r{idx}/{self.population_size}' ,end='')
+        return individual
+
+        
+
     def create_initial_population(self):
         """Create members of the first population randomly.
         """
-        initial_population = []
+        
         print('first population generation started...')
-        for i in range(self.population_size):
-            print('\r{}/{} [{:5.2f}%]'.format(i+1, self.population_size,(i+1)/self.population_size*100), end='')
-            genes = np.array(self.create_individual(self.seed_data)).astype(np.int8)
-            individual = Chromosome(genes)
-            initial_population.append(individual)
+        pop_list = [i for i in range(self.population_size)]
+
+        with ThreadPool(self.num_workers) as p:
+           initial_population = p.map(self.concurrent_creation, pop_list)
+
+          
         self.current_generation = initial_population
-        print('finished.')
+        print(len(self.current_generation))
+        print('Finished.')
+            
+        
         
     def calculate_population_fitness(self):
         """Calculate the fitness of every member of the given population using
