@@ -6,7 +6,7 @@ pyeasyga
 
 Introduction
 ------------
-*Fork* of pyeasyga with some optimizations with numpy arrays and multiprocessing.
+_Fork_ of pyeasyga with some optimizations with numpy arrays and multiprocessing.
 
 A simple and easy-to-use implementation of a Genetic Algorithm library in Python.
 
