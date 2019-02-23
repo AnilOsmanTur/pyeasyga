@@ -44,18 +44,3 @@ Examples
 
 See the Usage section in the documentation for examples. The example files can 
 be found in the ``examples`` directory.
-
-
-
-.. |PyPI| image:: https://badge.fury.io/py/pyeasyga.png
-   :target: http://badge.fury.io/py/pyeasyga
-
-.. |Build Status| image:: https://travis-ci.org/remiomosowon/pyeasyga.png?branch=develop
-   :target: https://travis-ci.org/remiomosowon/pyeasyga
-
-.. |Coverage Status| image:: https://coveralls.io/repos/remiomosowon/pyeasyga/badge.png?branch=develop
-   :target: https://coveralls.io/r/remiomosowon/pyeasyga?branch=develop
-
-.. |Downloads| image:: https://img.shields.io/pypi/dm/pyeasyga.png
-   :target: https://pypi.python.org/pypi/pyeasyga
-
