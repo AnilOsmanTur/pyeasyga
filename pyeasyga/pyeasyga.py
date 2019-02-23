@@ -3,13 +3,16 @@
     pyeasyga module
 
 """
+
+
 import time
 import random
 import copy
 import numpy as np
 from operator import attrgetter
 
-from multiprocessing.dummy import Pool as ThreadPool
+#from multiprocessing.dummy import Pool
+from pathos.multiprocessing import ProcessingPool as Pool
 
 from six.moves import range
 
@@ -130,7 +133,7 @@ class GeneticAlgorithm(object):
     def concurrent_creation(self, idx):
         genes = np.array(self.create_individual(self.seed_data)).astype(np.int8)
         individual = Chromosome(genes)
-        print(f'\r{idx}/{self.population_size}' ,end='')
+        print(f'\r{idx}/{self.population_size}' + ' '*10 ,end='')
         return individual
 
         
@@ -142,12 +145,11 @@ class GeneticAlgorithm(object):
         print('first population generation started...')
         pop_list = [i for i in range(self.population_size)]
 
-        with ThreadPool(self.num_workers) as p:
+        with Pool(self.num_workers) as p:
            initial_population = p.map(self.concurrent_creation, pop_list)
 
           
         self.current_generation = initial_population
-        print(len(self.current_generation))
         print('Finished.')
             
         
@@ -271,3 +273,4 @@ class Chromosome(object):
         """Return initialised Chromosome representation in human readable form.
         """
         return repr((self.fitness, self.genes))
+    

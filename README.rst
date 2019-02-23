@@ -6,10 +6,12 @@ pyeasyga
 
 Introduction
 ------------
+Fork of pyeasyga with some optimizations with numpy arrays and multiprocessing.
+
 A simple and easy-to-use implementation of a Genetic Algorithm library in Python.
 
 ``pyeasyga`` provides a simple interface to the power of Genetic Algorithms
-(GAs). You don't have to have expert GA knowledge in order to use it.
+(GAs). You don't have to have expert GA knowledge in order to use it. 
 
 * Homepage: https://github.com/remiomosowon/pyeasyga
 * PyPI: https://pypi.python.org/pypi/pyeasyga
@@ -34,6 +36,11 @@ Or clone this repository and run ``python setup.py install`` from within the pro
 For alternative install methods, see the INSTALL file or the Installation 
 section in the documentation.
 
+Requirements
+~~~~~~~~~~~~
+ - six
+ - numpy
+ - pathos
 
 Examples
 ~~~~~~~~
