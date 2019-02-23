@@ -15,7 +15,7 @@ from operator import attrgetter
 from pathos.multiprocessing import ProcessingPool as Pool
 
 from six.moves import range
-
+import sys
 
 class GeneticAlgorithm(object):
     """Genetic Algorithm class.
@@ -134,6 +134,7 @@ class GeneticAlgorithm(object):
         genes = np.array(self.create_individual(self.seed_data)).astype(np.int8)
         individual = Chromosome(genes)
         print(f'\r{idx}/{self.population_size}' + ' '*10 ,end='')
+        sys.stdout.flush()
         return individual
 
         
