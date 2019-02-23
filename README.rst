@@ -42,11 +42,6 @@ See the Usage section in the documentation for examples. The example files can
 be found in the ``examples`` directory.
 
 
-Note
------
-
-* Currently under active development
-
 
 .. |PyPI| image:: https://badge.fury.io/py/pyeasyga.png
    :target: http://badge.fury.io/py/pyeasyga
