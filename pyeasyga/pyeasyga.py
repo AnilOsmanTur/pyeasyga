@@ -3,9 +3,10 @@
     pyeasyga module
 
 """
-
+import time
 import random
 import copy
+import numpy as np
 from operator import attrgetter
 
 from six.moves import range
@@ -40,7 +41,8 @@ class GeneticAlgorithm(object):
                  crossover_probability=0.8,
                  mutation_probability=0.2,
                  elitism=True,
-                 maximise_fitness=True):
+                 maximise_fitness=True,
+                 random_seed=None):
         """Instantiate the Genetic Algorithm.
 
         :param seed_data: input data to the Genetic Algorithm
@@ -51,7 +53,7 @@ class GeneticAlgorithm(object):
         :param float mutation_probability: probability of mutation operation
 
         """
-
+        random.seed(random_seed)
         self.seed_data = seed_data
         self.population_size = population_size
         self.generations = generations
@@ -61,6 +63,8 @@ class GeneticAlgorithm(object):
         self.maximise_fitness = maximise_fitness
 
         self.current_generation = []
+        self.fitness_stats = np.zeros(population_size)
+    
 
         def create_individual(seed_data):
             """Create a candidate solution representation.
@@ -85,8 +89,8 @@ class GeneticAlgorithm(object):
 
             """
             index = random.randrange(1, len(parent_1))
-            child_1 = parent_1[:index] + parent_2[index:]
-            child_2 = parent_2[:index] + parent_1[index:]
+            child_1 = np.concatenate([parent_1[:index], parent_2[index:]], axis=0)
+            child_2 = np.concatenate([parent_2[:index], parent_1[index:]], axis=0)
             return child_1, child_2
 
         def mutate(individual):
@@ -122,12 +126,15 @@ class GeneticAlgorithm(object):
         """Create members of the first population randomly.
         """
         initial_population = []
-        for _ in range(self.population_size):
-            genes = self.create_individual(self.seed_data)
+        print('first population generation started...')
+        for i in range(self.population_size):
+            print('\r{}/{} [{:5.2f}%]'.format(i+1, self.population_size,(i+1)/self.population_size*100), end='')
+            genes = np.array(self.create_individual(self.seed_data)).astype(np.int8)
             individual = Chromosome(genes)
             initial_population.append(individual)
         self.current_generation = initial_population
-
+        print('finished.')
+        
     def calculate_population_fitness(self):
         """Calculate the fitness of every member of the given population using
         the supplied fitness_function.
@@ -194,13 +201,33 @@ class GeneticAlgorithm(object):
         self.calculate_population_fitness()
         self.rank_population()
 
+    def compute_fitness_stats(self):
+        self.fitness_stats.fill(0)
+        
+        for i, gen in enumerate(self.current_generation):
+            self.fitness_stats[i] = gen.fitness
+            
+        return self.fitness_stats.mean(), self.fitness_stats.std(), self.fitness_stats.min(), self.fitness_stats.max()
+
     def run(self):
         """Run (solve) the Genetic Algorithm."""
+        print('Run started....')
+        start = time.time()
         self.create_first_generation()
-
-        for _ in range(1, self.generations):
+        gen_mean, gen_std, gen_min, gen_max  = self.compute_fitness_stats()
+        first_run = time.time() - start
+        print('1. run fitness stats: max: {} min: {} mean: {:.3f} std: {:.3f} {:.2f} s'.format(
+                gen_max, gen_min, gen_mean, gen_std, first_run))
+        for i in range(1, self.generations+1):
+            run_start_time = time.time()
             self.create_next_generation()
-
+            gen_mean, gen_std, gen_min, gen_max  = self.compute_fitness_stats()
+            run_time = time.time() - run_start_time
+            print('\rRun {}/{} [{:5.2f}%] fitness stats: max: {} min: {} mean: {:.3f} std: {:.3f} {:.2f} s'.format(i, self.generations,
+                  i/self.generations*100, gen_max, gen_min, gen_mean, gen_std, run_time), end='')
+        end = time.time() - start
+        print('\nDone. total {:.2f} s'.format(end))
+        
     def best_individual(self):
         """Return the individual with the best fitness in the current
         generation.
